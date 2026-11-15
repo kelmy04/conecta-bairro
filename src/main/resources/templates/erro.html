@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecalho('Página não encontrada')}"></head>
+<body>
+<header th:replace="~{fragmentos :: topo}"></header>
+<main class="container py-5 text-center">
+  <h1>Não encontramos o que você procura</h1>
+  <p class="lead" th:text="${mensagem}">Mensagem de erro</p>
+  <a class="btn btn-azul btn-lg" th:href="@{/}">Voltar para a vitrine</a>
+</main>
+</body>
+</html>

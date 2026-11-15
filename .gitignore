@@ -1,0 +1,13 @@
+# Compilação e dados enviados
+target/
+uploads/
+
+# Segredos e configuração da sua máquina (NUNCA envie para o GitHub)
+.env
+src/main/resources/application-local.properties
+
+# Editores / sistema
+.vscode/
+.idea/
+*.iml
+.DS_Store

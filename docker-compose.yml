@@ -1,0 +1,37 @@
+# Sobe o site + o PostgreSQL com um comando:  docker compose up --build
+# Antes: copie .env.example para .env e defina DB_PASSWORD.
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: conecta_bairro
+      POSTGRES_USER: conecta
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD no arquivo .env}
+    volumes:
+      - dados-banco:/var/lib/postgresql/data      # o banco sobrevive a reinicializações
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U conecta -d conecta_bairro"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy                # só inicia o site quando o banco está pronto
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/conecta_bairro
+      DB_USER: conecta
+      DB_PASSWORD: ${DB_PASSWORD}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}      # use true quando o site estiver em HTTPS
+    volumes:
+      - fotos:/data/uploads                       # as fotos sobrevivem a novas versões
+
+volumes:
+  dados-banco:
+  fotos:

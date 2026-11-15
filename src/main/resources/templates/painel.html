@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecalho('Painel - ' + ${c.nome})}"></head>
+<body>
+<header th:replace="~{fragmentos :: topo}"></header>
+<div th:replace="~{fragmentos :: avisos}"></div>
+<main class="container py-4">
+  <h1>Painel: <span th:text="${c.nome}">Comércio</span></h1>
+  <a th:href="@{/comercio/{id}(id=${c.id})}" class="fs-5">Ver minha vitrine</a>
+
+  <!-- ===== PAINEL DE PRODUTOS (Mercado, Açougue, Pet Shop, Roupas) ===== -->
+  <div th:unless="${c.agendavel}" class="mt-4">
+    <h2>Novo produto</h2>
+    <form method="post" enctype="multipart/form-data" th:action="@{/painel/{id}/produtos(id=${c.id})}" class="row g-3 mb-4">
+      <div class="col-12"><input name="nome" class="form-control form-control-lg" placeholder="Nome do produto" required></div>
+      <div class="col-6"><input name="preco" type="number" step="0.01" min="0.01" class="form-control form-control-lg" placeholder="Preço (R$)" required></div>
+      <div class="col-6"><input name="estoque" type="number" min="0" class="form-control form-control-lg" placeholder="Estoque" required></div>
+      <!-- ETAPA 1: a foto agora é um arquivo (JPG/PNG até 3 MB). A pré-visualização aparece ao lado do campo. -->
+      <div class="col-12">
+        <label class="form-label fs-5" for="fotoProduto">Foto do produto (opcional)</label>
+        <div class="d-flex gap-3 align-items-center">
+          <input id="fotoProduto" name="fotoProduto" type="file" accept="image/jpeg,image/png"
+                 class="form-control form-control-lg" onchange="escolherFoto(this)">
+          <img id="previa" class="miniatura d-none" alt="Pré-visualização da foto">
+        </div>
+        <small class="text-muted">JPG ou PNG, até 3 MB.</small>
+      </div>
+      <div class="col-12"><button class="btn btn-verde btn-lg w-100">Salvar produto</button></div>
+    </form>
+
+    <h2>Meus produtos</h2>
+    <div class="table-responsive">
+      <table class="table align-middle fs-5">
+        <thead><tr><th>Foto</th><th>Produto</th><th>Preço</th><th>Estoque</th><th></th></tr></thead>
+        <tbody>
+          <tr th:each="p : ${produtos}">
+            <td>
+              <img th:if="${not #strings.isEmpty(p.fotoUrl)}" th:src="@{${p.fotoUrl}}" th:alt="${p.nome}"
+                   class="miniatura" onerror="this.style.display='none'">
+            </td>
+            <td th:text="${p.nome}"></td>
+            <td th:text="${#numbers.formatCurrency(p.preco)}"></td>
+            <td th:text="${p.estoque}"></td>
+            <td class="text-nowrap">
+              <!-- ITEM 3: botão Editar (lápis) abre o formulário já preenchido -->
+              <a class="btn btn-azul" th:href="@{/painel/{id}/produtos/{pid}/editar(id=${c.id},pid=${p.id})}"
+                 title="Editar produto" aria-label="Editar produto">&#9998; Editar</a>
+              <button type="button" class="btn btn-laranja" th:onclick="|gerarPost(${p.id})|">Gerar post</button>
+              <form method="post" class="d-inline" th:action="@{/painel/{id}/produtos/{pid}/excluir(id=${c.id},pid=${p.id})}">
+                <button class="btn btn-outline-danger" onclick="return confirm('Remover este produto?')">Remover</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Área do post de divulgação -->
+    <div id="areaPost" class="card p-3 d-none">
+      <h3>Seu post está pronto</h3>
+      <textarea id="post" rows="9" class="form-control fs-5 mb-3"></textarea>
+      <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-azul btn-lg" onclick="copiar()">Copiar texto</button>
+        <button class="btn btn-verde btn-lg" onclick="enviarWhats()">Enviar no WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PAINEL DE AGENDA (Barbearia) ===== -->
+  <div th:if="${c.agendavel}" class="mt-4">
+    <h2>Agenda do dia</h2>
+    <form method="get" class="mb-3">
+      <input type="date" name="data" th:value="${dia}" class="form-control form-control-lg" onchange="this.form.submit()">
+    </form>
+    <ul class="list-group fs-5">
+      <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2" th:each="a : ${agenda}">
+        <!-- Agendamento cancelado aparece riscado, com a etiqueta "Cancelado" -->
+        <span th:classappend="${a.status.name() == 'CANCELADO'} ? 'text-decoration-line-through text-muted'"
+              th:text="${#temporals.format(a.dataHora,'HH:mm')} + ' - ' + ${a.clienteNome} + ' (' + ${a.servico} + ') ' + ${a.clienteTelefone}"></span>
+        <span th:if="${a.status.name() == 'CANCELADO'}" class="badge text-bg-secondary">Cancelado</span>
+        <!-- ITEM 2: botão Cancelar só para agendamentos confirmados (POST + confirmação) -->
+        <form th:if="${a.status.name() == 'CONFIRMADO'}" method="post" class="m-0"
+              th:action="@{/painel/{id}/agendamentos/{agId}/cancelar(id=${c.id},agId=${a.id})}"
+              onsubmit="return confirm('Cancelar este agendamento? O horário ficará livre novamente.')">
+          <button class="btn btn-outline-danger">Cancelar</button>
+        </form>
+      </li>
+    </ul>
+    <p th:if="${#lists.isEmpty(agenda)}" class="fs-5">Nenhum cliente marcado neste dia.</p>
+  </div>
+</main>
+
+<script>
+  // Confere o tamanho (máx. 3 MB) e mostra a miniatura da imagem escolhida, ao lado do campo
+  function escolherFoto(input) {
+    const img = document.getElementById('previa');
+    const f = input.files[0];
+    if (f && f.size > 3 * 1024 * 1024) {
+      alert('A imagem deve ter no máximo 3 MB.');
+      input.value = '';
+      img.classList.add('d-none');
+      return;
+    }
+    if (!f) { img.classList.add('d-none'); return; }
+    img.src = URL.createObjectURL(f);     // prévia local, sem enviar nada ao servidor
+    img.classList.remove('d-none');
+  }
+  // Busca o texto pronto na API e mostra na tela
+  async function gerarPost(id) {
+    const r = await fetch('/api/produtos/' + id + '/post');
+    document.getElementById('post').value = await r.text();
+    document.getElementById('areaPost').classList.remove('d-none');
+    document.getElementById('areaPost').scrollIntoView({behavior: 'smooth'});
+  }
+  function copiar() {
+    navigator.clipboard.writeText(document.getElementById('post').value);
+    alert('Texto copiado! Agora é só colar no WhatsApp ou Instagram.');
+  }
+  function enviarWhats() {
+    window.open('https://wa.me/?text=' + encodeURIComponent(document.getElementById('post').value));
+  }
+</script>
+</body>
+</html>

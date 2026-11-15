@@ -1,0 +1,7 @@
+target
+uploads
+.git
+.github
+.vscode
+.env
+src/main/resources/application-local.properties

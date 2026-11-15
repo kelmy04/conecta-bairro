@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecalho('Conecta Bairro')}"></head>
+<body>
+<header th:replace="~{fragmentos :: topo}"></header>
+<main class="container py-4">
+  <div class="alert alert-success fs-5" th:if="${param.contaExcluida}">Sua conta foi excluída.</div>
+  <h1>Os comércios do nosso bairro</h1>
+  <p class="lead">Escolha um comércio para ver produtos ou marcar horário.</p>
+  <!-- grupo.key = nome da categoria (em ordem alfabética: TreeMap); grupo.value = lista de comércios -->
+  <section th:each="grupo : ${grupos}" class="mb-5">
+    <h2 class="categoria" th:text="${grupo.key}">Categoria</h2>
+    <div class="row g-4">
+      <div class="col-12 col-md-6 col-lg-4" th:each="c : ${grupo.value}">
+        <a class="card card-comercio h-100" th:href="@{/comercio/{id}(id=${c.id})}">
+          <!-- CORREÇÃO B4: foto de capa só aparece se houver link (th:if). Sem foto, mostra um bloco neutro. -->
+          <img th:if="${not #strings.isEmpty(c.fotoCapa)}" th:src="@{${c.fotoCapa}}"
+               th:alt="${'Foto de ' + c.nome}" class="capa" onerror="this.style.display='none'">
+          <div th:unless="${not #strings.isEmpty(c.fotoCapa)}" class="capa capa-vazia">Sem foto</div>
+          <div class="card-body">
+            <h3 th:text="${c.nome}">Nome</h3>
+            <p class="mb-0" th:text="${c.endereco}">Endereço</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+  <p th:if="${#maps.isEmpty(grupos)}" class="fs-4">Nenhum comércio cadastrado ainda. Seja o primeiro!</p>
+</main>
+</body>
+</html>

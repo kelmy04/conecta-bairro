@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecalho('Criar conta')}"></head>
+<body>
+<header th:replace="~{fragmentos :: topo}"></header>
+<main class="container py-4" style="max-width:520px">
+  <h1>Criar conta</h1>
+  <p class="lead">Crie sua conta para cadastrar e gerenciar seus comércios.</p>
+  <!-- th:object liga o formulário ao RegistroForm; th:errors mostra as mensagens de validação -->
+  <form method="post" th:action="@{/registrar}" th:object="${registroForm}">
+    <div class="mb-3">
+      <label class="form-label fs-5" for="nome">Seu nome</label>
+      <input th:field="*{nome}" class="form-control form-control-lg" required autofocus>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fs-5" for="email">E-mail</label>
+      <input th:field="*{email}" type="email" class="form-control form-control-lg" required>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fs-5" for="senha">Senha (mínimo 6 caracteres)</label>
+      <input th:field="*{senha}" type="password" class="form-control form-control-lg" required>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></p>
+    </div>
+    <div class="mb-4">
+      <label class="form-label fs-5" for="confirmarSenha">Repita a senha</label>
+      <input th:field="*{confirmarSenha}" type="password" class="form-control form-control-lg" required>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('confirmarSenha')}" th:errors="*{confirmarSenha}"></p>
+    </div>
+    <button class="btn btn-verde btn-lg w-100">Criar conta</button>
+  </form>
+  <p class="fs-5 mt-4">Já tem conta? <a th:href="@{/login}">Entrar</a></p>
+</main>
+</body>
+</html>

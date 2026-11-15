@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecalho(${c.nome})}"></head>
+<body>
+<header th:replace="~{fragmentos :: topo}"></header>
+<div th:replace="~{fragmentos :: avisos}"></div>
+<main class="container py-4">
+  <a th:href="@{/}" class="fs-5">← Voltar</a>
+  <h1 class="mt-2" th:text="${c.nome}">Nome</h1>
+  <p class="lead" th:text="${c.categoria.nome + ' · ' + c.endereco}"></p>
+  <!-- CORREÇÃO B4: foto de capa do comércio (só aparece se houver link) -->
+  <img th:if="${not #strings.isEmpty(c.fotoCapa)}" th:src="@{${c.fotoCapa}}" th:alt="${'Foto de ' + c.nome}"
+       class="capa-grande rounded mb-3" onerror="this.style.display='none'">
+  <!-- Botão direto para o WhatsApp do lojista -->
+  <a class="btn btn-verde btn-lg mb-4" target="_blank" th:href="'https://wa.me/' + ${c.whatsapp}">Falar no WhatsApp</a>
+
+  <!-- Comércio de produtos: lista -->
+  <div th:unless="${c.agendavel}" class="row g-4">
+    <div class="col-12 col-md-6 col-lg-4" th:each="p : ${produtos}">
+      <div class="card h-100">
+        <!-- CORREÇÃO B4: foto do produto (só aparece se houver link) -->
+        <img th:if="${not #strings.isEmpty(p.fotoUrl)}" th:src="@{${p.fotoUrl}}" th:alt="${p.nome}"
+             class="card-img-top foto-produto" onerror="this.style.display='none'">
+        <div class="card-body">
+        <h3 th:text="${p.nome}">Produto</h3>
+        <p class="preco" th:text="${#numbers.formatCurrency(p.preco)}">R$ 0,00</p>
+        <p th:text="${p.estoque > 0} ? 'Disponível: ' + ${p.estoque} : 'Esgotado'"></p>
+      </div></div>
+    </div>
+    <p th:if="${#lists.isEmpty(produtos)}" class="fs-4">Ainda não há produtos cadastrados.</p>
+  </div>
+
+  <!-- Barbearia: escolha de data e horário -->
+  <div th:if="${c.agendavel}">
+    <h2>Marque seu horário</h2>
+    <!-- Expediente escolhido pelo lojista -->
+    <p class="fs-5 text-muted">Atendimento das <strong th:text="${#temporals.format(abertura,'HH:mm')}">08:00</strong>
+      às <strong th:text="${#temporals.format(fechamento,'HH:mm')}">18:00</strong>.</p>
+
+    <!-- 1. Dia: este formulário (GET) só recarrega a lista de horários livres. Limite: hoje até 60 dias à frente -->
+    <form method="get" class="mb-3">
+      <label class="form-label fs-5" for="data">1. Escolha o dia</label>
+      <input id="data" type="date" name="data" th:value="${dia}" th:attr="min=${hoje},max=${limite}"
+             class="form-control form-control-lg" onchange="this.form.submit()">
+    </form>
+
+    <!-- ITEM 1: th:object liga o formulário ao AgendamentoForm; os erros aparecem em vermelho abaixo de cada campo -->
+    <form method="post" th:action="@{/comercio/{id}/agendar(id=${c.id})}" th:object="${agendamentoForm}">
+      <input type="hidden" name="data" th:value="${dia}">
+      <p class="text-danger fs-6" th:if="${#fields.hasErrors('data')}" th:errors="*{data}"></p>
+
+      <div class="mb-3">
+        <label class="form-label fs-5" for="hora">2. Horários livres</label>
+        <!-- Todos os horários (de 10 em 10 min). Os já reservados aparecem marcados e geram um aviso ao escolher -->
+        <select id="hora" name="hora" class="form-select form-select-lg" required onchange="verificarHorario()">
+          <option value="">Escolha um horário</option>
+          <option th:each="s : ${horarios}" th:value="${#temporals.format(s.hora,'HH:mm')}"
+                  th:text="${#temporals.format(s.hora,'HH:mm')} + (${s.ocupado} ? ' - já reservado' : '')"
+                  th:attr="data-reservado=${s.ocupado}"
+                  th:classappend="${s.ocupado} ? 'text-danger'"
+                  th:selected="${agendamentoForm.hora != null and agendamentoForm.hora == s.hora}"></option>
+        </select>
+        <!-- Aviso imediato (vermelho) quando o horário escolhido já foi reservado por outra pessoa -->
+        <p id="avisoReservado" class="text-danger fs-5 mt-2 mb-0 d-none" role="alert">
+          Esse horário já foi reservado. Escolha outro.
+        </p>
+        <p th:if="${#lists.isEmpty(horarios)}" class="text-danger fs-5 mb-0">Sem horários neste dia. Escolha outra data.</p>
+        <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('hora')}" th:errors="*{hora}"></p>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fs-5" for="servico">3. Serviço</label>
+        <select id="servico" name="servico" class="form-select form-select-lg">
+          <option th:each="s : ${servicos}" th:value="${s}" th:text="${s}"
+                  th:selected="${s == agendamentoForm.servico}"></option>
+        </select>
+        <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('servico')}" th:errors="*{servico}"></p>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fs-5" for="nome">Seu nome</label>
+        <input th:field="*{nome}" maxlength="100" class="form-control form-control-lg" required>
+        <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fs-5" for="telefone">Seu telefone (com DDD)</label>
+        <input th:field="*{telefone}" type="tel" maxlength="20" placeholder="(65) 99999-0000"
+               class="form-control form-control-lg" required>
+        <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></p>
+      </div>
+
+      <button id="btnReservar" class="btn btn-laranja btn-lg w-100">Reservar horário</button>
+      <small class="text-muted d-block mt-2">Usamos seu nome e telefone apenas para este agendamento.</small>
+    </form>
+  </div>
+</main>
+<script>
+  // Se o horário escolhido já foi reservado: mostra o aviso e impede o envio.
+  // (O servidor confere de novo, caso duas pessoas reservem no mesmo instante.)
+  function verificarHorario() {
+    const sel = document.getElementById('hora');
+    if (!sel) return;
+    const opcao = sel.options[sel.selectedIndex];
+    const reservado = !!opcao && opcao.dataset.reservado === 'true';
+    document.getElementById('avisoReservado').classList.toggle('d-none', !reservado);
+    document.getElementById('btnReservar').disabled = reservado;
+  }
+  document.addEventListener('DOMContentLoaded', verificarHorario);
+</script>
+</body>
+</html>

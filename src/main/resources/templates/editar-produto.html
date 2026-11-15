@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecalho('Editar produto')}"></head>
+<body>
+<header th:replace="~{fragmentos :: topo}"></header>
+<main class="container py-4" style="max-width:640px">
+  <a th:href="@{/painel/{id}(id=${c.id})}" class="fs-5">← Voltar ao painel</a>
+  <h1 class="mt-2">Editar produto</h1>
+
+  <!-- ITEM 3: formulário já preenchido. enctype multipart permite trocar a foto (arquivo) -->
+  <form method="post" enctype="multipart/form-data" th:object="${produtoForm}"
+        th:action="@{/painel/{id}/produtos/{pid}/editar(id=${c.id},pid=${produto.id})}">
+    <div class="mb-3">
+      <label class="form-label fs-5" for="nome">Nome do produto</label>
+      <input th:field="*{nome}" class="form-control form-control-lg" required>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+    </div>
+    <div class="row g-3 mb-3">
+      <div class="col-6">
+        <label class="form-label fs-5" for="preco">Preço (R$)</label>
+        <!-- formatDecimal garante o ponto decimal (24.90), exigido pelo campo number -->
+        <input id="preco" name="preco" type="number" step="0.01" min="0.01" class="form-control form-control-lg" required
+               th:value="${#numbers.formatDecimal(produtoForm.preco,1,'NONE',2,'POINT')}">
+        <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('preco')}" th:errors="*{preco}"></p>
+      </div>
+      <div class="col-6">
+        <label class="form-label fs-5" for="estoque">Estoque</label>
+        <input th:field="*{estoque}" type="number" min="0" class="form-control form-control-lg" required>
+        <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('estoque')}" th:errors="*{estoque}"></p>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label class="form-label fs-5" for="fotoProduto">Trocar foto (opcional)</label>
+      <div class="d-flex gap-3 align-items-center mb-2" th:if="${not #strings.isEmpty(produto.fotoUrl)}">
+        <img th:src="@{${produto.fotoUrl}}" alt="Foto atual do produto" class="miniatura" onerror="this.style.display='none'">
+        <small class="text-muted">Foto atual. Se você não escolher outra, ela será mantida.</small>
+      </div>
+      <input id="fotoProduto" name="fotoProduto" type="file" accept="image/jpeg,image/png"
+             class="form-control form-control-lg" onchange="validarTamanho(this)">
+      <small class="text-muted">JPG ou PNG, até 3 MB. A foto antiga é apagada ao salvar a nova.</small>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('fotoProduto')}" th:errors="*{fotoProduto}"></p>
+    </div>
+
+    <button class="btn btn-verde btn-lg w-100">Salvar alterações</button>
+    <a class="btn btn-outline-secondary btn-lg w-100 mt-2" th:href="@{/painel/{id}(id=${c.id})}">Cancelar</a>
+  </form>
+</main>
+<script>
+  // Avisa antes de enviar se a imagem passa de 3 MB (o servidor também confere)
+  function validarTamanho(input) {
+    const f = input.files[0];
+    if (f && f.size > 3 * 1024 * 1024) { alert('A imagem deve ter no máximo 3 MB.'); input.value = ''; }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecalho('Comércio')}"></head>
+<body>
+<header th:replace="~{fragmentos :: topo}"></header>
+<main class="container py-4" style="max-width:640px">
+  <!-- O mesmo formulário serve para CADASTRAR e para EDITAR (variável "editando" vinda do controller) -->
+  <h1 th:text="${editando} ? 'Editar estabelecimento' : 'Cadastre seu comércio'">Cadastre seu comércio</h1>
+
+  <!-- ETAPA 1: enctype="multipart/form-data" é obrigatório para enviar arquivos -->
+  <form method="post" enctype="multipart/form-data" th:object="${comercioForm}"
+        th:action="${editando} ? @{${acao}} : @{/cadastrar}">
+    <div class="mb-3">
+      <label class="form-label fs-5" for="nome">Nome do comércio</label>
+      <input th:field="*{nome}" class="form-control form-control-lg" required>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
+    </div>
+
+    <!-- Novo comércio: escolhe o tipo -->
+    <div class="mb-3" th:unless="${editando}">
+      <label class="form-label fs-5" for="categoriaId">Tipo</label>
+      <select th:field="*{categoriaId}" class="form-select form-select-lg" required onchange="atualizarExpediente()">
+        <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nome}"
+                th:attr="data-agenda=${cat.tipoPainel.name() == 'AGENDAMENTO'}"></option>
+      </select>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('categoriaId')}" th:errors="*{categoriaId}"></p>
+    </div>
+    <!-- Edição: o tipo não muda (trocaria o painel entre produtos e agenda) -->
+    <div class="mb-3" th:if="${editando}">
+      <label class="form-label fs-5">Tipo</label>
+      <p class="fs-5 fw-bold mb-0" th:text="${categoriaNome}">Mercado</p>
+      <input type="hidden" th:field="*{categoriaId}">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fs-5" for="endereco">Endereço</label>
+      <input th:field="*{endereco}" class="form-control form-control-lg" required>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('endereco')}" th:errors="*{endereco}"></p>
+    </div>
+    <div class="mb-3">
+      <label class="form-label fs-5" for="whatsapp">WhatsApp (com DDD)</label>
+      <input th:field="*{whatsapp}" class="form-control form-control-lg" placeholder="(65) 99999-0000" required>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('whatsapp')}" th:errors="*{whatsapp}"></p>
+    </div>
+
+    <!-- Expediente da agenda: só aparece para BARBEARIA. O fechamento é quando o atendimento encerra:
+         abre 07:00 e fecha 22:00 -> reservas das 07:00 até 21:50, de 10 em 10 minutos -->
+    <div id="blocoExpediente" class="mb-3 border rounded p-3 bg-white"
+         th:if="${!editando or agendavel}" th:classappend="${!editando} ? 'd-none'">
+      <p class="fs-5 fw-bold mb-1">Horário de atendimento da agenda</p>
+      <p class="text-muted mb-3">Os clientes reservam de 10 em 10 minutos, entre a abertura e o fechamento.</p>
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="form-label fs-5" for="abertura">Abertura</label>
+          <input th:field="*{abertura}" type="time" step="600" class="form-control form-control-lg">
+          <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('abertura')}" th:errors="*{abertura}"></p>
+        </div>
+        <div class="col-6">
+          <label class="form-label fs-5" for="fechamento">Fechamento</label>
+          <input th:field="*{fechamento}" type="time" step="600" class="form-control form-control-lg">
+          <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('fechamento')}" th:errors="*{fechamento}"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ETAPA 1: foto de capa agora é um arquivo (JPG/PNG, até 3 MB) -->
+    <div class="mb-4">
+      <label class="form-label fs-5" for="fotoCapa"
+             th:text="${editando} ? 'Trocar foto de capa (opcional)' : 'Foto de capa (opcional)'">Foto de capa</label>
+      <div class="mb-2" th:if="${editando}">
+        <div th:if="${not #strings.isEmpty(fotoAtual)}">
+          <img th:src="@{${fotoAtual}}" alt="Foto atual do comércio" class="capa-grande rounded mb-1"
+               onerror="this.style.display='none'">
+          <small class="text-muted d-block">Foto atual. Se você não escolher outra, ela será mantida.</small>
+        </div>
+      </div>
+      <input id="fotoCapa" name="fotoCapa" type="file" accept="image/jpeg,image/png"
+             class="form-control form-control-lg" onchange="validarTamanho(this)">
+      <small class="text-muted">JPG ou PNG, até 3 MB.</small>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('fotoCapa')}" th:errors="*{fotoCapa}"></p>
+    </div>
+
+    <button class="btn btn-verde btn-lg w-100" th:text="${editando} ? 'Salvar alterações' : 'Cadastrar'">Cadastrar</button>
+    <a class="btn btn-outline-secondary btn-lg w-100 mt-2" th:if="${editando}" th:href="@{/meu-painel}">Cancelar</a>
+  </form>
+</main>
+<script>
+  // Mostra os campos de abertura/fechamento só quando o tipo escolhido é uma barbearia (agenda)
+  function atualizarExpediente() {
+    const bloco = document.getElementById('blocoExpediente');
+    if (!bloco) return;
+    const sel = document.getElementById('categoriaId');
+    let agenda = true;                                   // na edição não há <select>: o bloco só existe para barbearia
+    if (sel) {
+      const opcao = sel.options[sel.selectedIndex];
+      agenda = !!opcao && opcao.dataset.agenda === 'true';
+      bloco.classList.toggle('d-none', !agenda);
+    }
+    bloco.querySelectorAll('input').forEach(i => i.required = agenda);
+  }
+  document.addEventListener('DOMContentLoaded', atualizarExpediente);
+
+  // Avisa antes de enviar se a imagem passa de 3 MB (o servidor também confere)
+  function validarTamanho(input) {
+    const f = input.files[0];
+    if (f && f.size > 3 * 1024 * 1024) { alert('A imagem deve ter no máximo 3 MB.'); input.value = ''; }
+  }
+</script>
+</body>
+</html>

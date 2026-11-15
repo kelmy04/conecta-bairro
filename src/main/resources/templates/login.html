@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecalho('Entrar')}"></head>
+<body>
+<header th:replace="~{fragmentos :: topo}"></header>
+<div th:replace="~{fragmentos :: avisos}"></div>
+<main class="container py-4" style="max-width:480px">
+  <h1>Entrar</h1>
+  <p class="lead">Acesso do lojista ao painel do comércio.</p>
+  <!-- O Spring Security redireciona para /login?error quando e-mail ou senha estão errados -->
+  <div class="alert alert-danger fs-5" th:if="${param.error}">E-mail ou senha incorretos.</div>
+  <form method="post" th:action="@{/login}">
+    <label class="form-label fs-5" for="username">E-mail</label>
+    <input id="username" name="username" type="email" class="form-control form-control-lg mb-3" required autofocus>
+    <label class="form-label fs-5" for="password">Senha</label>
+    <input id="password" name="password" type="password" class="form-control form-control-lg mb-4" required>
+    <button class="btn btn-verde btn-lg w-100">Entrar</button>
+  </form>
+  <p class="fs-5 mt-4">Ainda não tem conta? <a th:href="@{/registrar}">Criar conta</a></p>
+</main>
+</body>
+</html>

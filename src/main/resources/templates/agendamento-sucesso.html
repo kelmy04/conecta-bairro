@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragmentos :: cabecalho('Horário reservado')}"></head>
+<body>
+<header th:replace="~{fragmentos :: topo}"></header>
+<main class="container py-4 text-center" style="max-width:640px">
+  <div class="display-1" aria-hidden="true">&#9989;</div>
+  <h1>Horário reservado!</h1>
+  <p class="lead">Falta só um passo: avise o estabelecimento pelo WhatsApp para confirmar.</p>
+
+  <!-- Resumo do agendamento (dados vindos do flash "confirmacao") -->
+  <div class="card text-start mb-4"><div class="card-body fs-5">
+    <p class="mb-1"><strong>Local:</strong> <span th:text="${c.nome}">Barbearia</span></p>
+    <p class="mb-1"><strong>Dia:</strong> <span th:text="${#temporals.format(confirmacao.data,'dd/MM/yyyy')}">01/01/2026</span></p>
+    <p class="mb-1"><strong>Hora:</strong> <span th:text="${#temporals.format(confirmacao.hora,'HH:mm')}">09:00</span></p>
+    <p class="mb-1"><strong>Serviço:</strong> <span th:text="${confirmacao.servico}">Corte</span></p>
+    <p class="mb-0"><strong>Nome:</strong> <span th:text="${confirmacao.nome}">Cliente</span></p>
+  </div></div>
+
+  <!-- ITEM 4: o link do WhatsApp é montado aqui. O Thymeleaf codifica a mensagem para URL (espaços, acentos...) -->
+  <a class="btn btn-verde btn-lg w-100 py-3 fs-3 mb-3" target="_blank" rel="noopener"
+     th:with="msg=${'Olá! Acabei de agendar um horário no ' + c.nome + ' para o dia ' + #temporals.format(confirmacao.data,'dd/MM/yyyy') + ' às ' + #temporals.format(confirmacao.hora,'HH:mm') + ' para o serviço ' + confirmacao.servico + '. Meu nome é ' + confirmacao.nome + '.'}"
+     th:href="@{https://wa.me/{numero}(numero=${c.whatsapp},text=${msg})}">Confirmar pelo WhatsApp</a>
+
+  <a class="btn btn-outline-secondary btn-lg w-100" th:href="@{/comercio/{id}(id=${c.id})}">Voltar ao comércio</a>
+</main>
+</body>
+</html>
