@@ -11,11 +11,13 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Fuso do negócio e pasta das fotos (monte um disco/volume persistente em /data/uploads)
+# Fuso do negócio. As fotos ficam no banco de dados, então não é preciso disco/volume.
+# JAVA_OPTS pensado para hospedagem gratuita (512 MB de RAM e CPU pequena):
+#  -Xmx300m  limita a memória do Java, deixando folga para o restante do processo;
+#  SerialGC e TieredStopAtLevel=1  usam menos memória e iniciam mais rápido em CPU fraca.
+# Para um servidor maior, sobrescreva a variável JAVA_OPTS no painel da hospedagem.
 ENV TZ=America/Cuiaba \
-    UPLOAD_DIR=/data/uploads \
-    JAVA_OPTS="-Xmx384m"
-RUN mkdir -p /data/uploads
+    JAVA_OPTS="-Xmx300m -XX:+UseSerialGC -XX:TieredStopAtLevel=1 -Djava.awt.headless=true"
 
 EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

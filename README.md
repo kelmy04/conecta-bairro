@@ -16,7 +16,7 @@
 ## Primeiro acesso
 - Não há usuário de exemplo: crie sua conta em `/registrar`, entre em `/login` e cadastre o comércio em `/meu-painel`.
 - Para zerar os dados de teste de um banco já existente, execute `src/main/resources/db/limpar-dados-de-teste.sql`
-  (e apague os arquivos da pasta `uploads/`).
+  (as fotos ficam no banco, na tabela `imagem`, e são apagadas junto).
 
 ## Agendamento (barbearia)
 - O lojista escolhe a abertura e o fechamento da agenda (ex.: 07:00 e 22:00 = reservas das 07:00 às 21:50), em horários de 10 em 10 minutos; os já reservados aparecem marcados e geram aviso, até 60 dias à frente; nome e telefone são validados.
@@ -24,8 +24,8 @@
 - No painel, o lojista pode cancelar agendamentos (o horário volta a ficar livre) e editar produtos.
 
 ## Imagens
-- As fotos são enviadas pelo formulário (JPG/PNG, até 3 MB) e ficam na pasta `uploads/` (raiz do projeto).
-- Se usar Git, adicione `uploads/` ao `.gitignore`.
+- As fotos são enviadas pelo formulário (JPG/PNG, até 3 MB) e ficam **no banco de dados** (tabela `imagem`).
+  Antes de gravar, são reduzidas (máx. 1280 px), giradas conforme o celular e têm o GPS (EXIF) removido.
 
 ## Endereços
 - Vitrine: `/`  | Login: `/login` | Meus comércios: `/meu-painel` | Cadastro: `/cadastrar`

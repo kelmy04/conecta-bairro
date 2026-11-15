@@ -29,9 +29,6 @@ services:
       DB_USER: conecta
       DB_PASSWORD: ${DB_PASSWORD}
       COOKIE_SECURE: ${COOKIE_SECURE:-false}      # use true quando o site estiver em HTTPS
-    volumes:
-      - fotos:/data/uploads                       # as fotos sobrevivem a novas versões
 
 volumes:
-  dados-banco:
-  fotos:
+  dados-banco:                                    # o banco (e as fotos, que ficam nele) sobrevive a reinicializações
