@@ -1,17 +1,17 @@
 # Conecta Bairro
 
-!\[Java](https://img.shields.io/badge/Java-17+-orange)
-!\[Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F)
-!\[PostgreSQL](https://img.shields.io/badge/PostgreSQL-banco%20de%20dados-336791)
-!\[Docker](https://img.shields.io/badge/Docker-pronto-2496ED)
-!\[Status](https://img.shields.io/badge/status-em%20produ%C3%A7%C3%A3o-brightgreen)
+![Java](https://img.shields.io/badge/Java-17+-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-banco%20de%20dados-336791)
+![Docker](https://img.shields.io/badge/Docker-pronto-2496ED)
+![Status](https://img.shields.io/badge/status-em%20produ%C3%A7%C3%A3o-brightgreen)
 
 Plataforma web que **digitaliza e conecta os pequenos comércios de um bairro**: mercado, açougue, pet shop, loja de roupas, barbearia e cabeleireiro(a).
 Os moradores encontram os comércios, veem produtos e marcam horários pelo celular; os donos gerenciam tudo em um painel simples, com fontes grandes e cores amigáveis, pensado para quem tem pouca familiaridade com tecnologia.
 
 Projeto de extensão universitária de Engenharia de Computação.
 
-\*\*Site no ar:\*\* https://conecta-bairro-lvcm.onrender.com
+**Site no ar:** https://conecta-bairro-lvcm.onrender.com
 
 ## Sumário
 
@@ -82,15 +82,15 @@ Estruturas de dados usadas: `TreeMap` para agrupar os comércios por categoria (
 
 1. Clone o repositório e entre na pasta.
 
-> No Windows, deixe a pasta em um caminho \\\*\\\*sem acentos nem espaços\\\*\\\* (ex.: `C:\\\\dev\\\\conecta-bairro`).
+> No Windows, deixe a pasta em um caminho **sem acentos nem espaços** (ex.: `C:\dev\conecta-bairro`).
 
-2. Crie um banco vazio no PostgreSQL, por exemplo `conecta\\\_bairro`.
+2. Crie um banco vazio no PostgreSQL, por exemplo `conecta_bairro`.
 3. Crie o arquivo `src/main/resources/application-local.properties` (ele fica fora do Git) com os dados do seu banco:
 
 ```properties
-   spring.datasource.url=jdbc:postgresql://localhost:5432/conecta\\\_bairro
+   spring.datasource.url=jdbc:postgresql://localhost:5432/conecta_bairro
    spring.datasource.username=postgres
-   spring.datasource.password=SUA\\\_SENHA
+   spring.datasource.password=SUA_SENHA
    ```
 
 4. Execute:
@@ -103,7 +103,7 @@ Estruturas de dados usadas: `TreeMap` para agrupar os comércios por categoria (
 
 As tabelas, as categorias e o índice que impede reservas duplicadas são criados **automaticamente** na primeira execução. O arquivo `src/main/resources/db/schema.sql` fica como documentação do modelo de dados.
 
-**Com Docker** (site e banco juntos): copie `.env.example` para `.env`, defina `DB\\\_PASSWORD` e rode `docker compose up --build`.
+**Com Docker** (site e banco juntos): copie `.env.example` para `.env`, defina `DB_PASSWORD` e rode `docker compose up --build`.
 
 ## Como usar
 
