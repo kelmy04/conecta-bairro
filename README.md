@@ -6,7 +6,7 @@
 ![Docker](https://img.shields.io/badge/Docker-pronto-2496ED)
 ![Status](https://img.shields.io/badge/status-em%20produ%C3%A7%C3%A3o-brightgreen)
 
-Plataforma web que **digitaliza e conecta os pequenos comércios de um bairro**: mercado, açougue, pet shop, loja de roupas, barbearia e cabeleireiro(a).
+Plataforma web que **digitaliza e conecta os pequenos comércios de um bairro**: mercado, açougue, pet shop, loja de roupas, indústria, lanchonete, bar, restaurante, barbearia e cabeleireiro(a).
 Os moradores encontram os comércios, veem produtos e marcam horários pelo celular; os donos gerenciam tudo em um painel simples, com fontes grandes e cores amigáveis, pensado para quem tem pouca familiaridade com tecnologia.
 
 Projeto de extensão universitária de Engenharia de Computação.

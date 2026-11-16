@@ -57,5 +57,7 @@ CREATE UNIQUE INDEX uq_agendamento_horario
 INSERT INTO categoria_comercio (nome, tipo_painel, servicos) VALUES
  ('Mercado','PRODUTOS',NULL),('Açougue','PRODUTOS',NULL),('Pet Shop','PRODUTOS',NULL),
  ('Loja de Roupas','PRODUTOS',NULL),
+ ('Indústria','PRODUTOS',NULL),('Lanchonete','PRODUTOS',NULL),
+ ('Bar','PRODUTOS',NULL),('Restaurante','PRODUTOS',NULL),
  ('Barbearia','AGENDAMENTO','Corte;Barba;Corte + Barba'),
  ('Cabeleireiro(a)','AGENDAMENTO','Corte;Escova;Coloração;Hidratação;Penteado');

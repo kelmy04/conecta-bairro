@@ -22,6 +22,11 @@ public class DadosIniciaisConfig {
             garantir(repo, "Açougue", TipoPainel.PRODUTOS, null);
             garantir(repo, "Pet Shop", TipoPainel.PRODUTOS, null);
             garantir(repo, "Loja de Roupas", TipoPainel.PRODUTOS, null);
+            // Alimentação e produção: usam o painel de PRODUTOS (cardápio / catálogo com foto e preço)
+            garantir(repo, "Indústria", TipoPainel.PRODUTOS, null);
+            garantir(repo, "Lanchonete", TipoPainel.PRODUTOS, null);
+            garantir(repo, "Bar", TipoPainel.PRODUTOS, null);
+            garantir(repo, "Restaurante", TipoPainel.PRODUTOS, null);
             garantir(repo, "Barbearia", TipoPainel.AGENDAMENTO, "Corte;Barba;Corte + Barba");
             garantir(repo, "Cabeleireiro(a)", TipoPainel.AGENDAMENTO, "Corte;Escova;Coloração;Hidratação;Penteado");
         };

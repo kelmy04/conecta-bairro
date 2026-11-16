@@ -8,7 +8,7 @@
   <h1>Painel: <span th:text="${c.nome}">Comércio</span></h1>
   <a th:href="@{/comercio/{id}(id=${c.id})}" class="fs-5">Ver minha vitrine</a>
 
-  <!-- ===== PAINEL DE PRODUTOS (Mercado, Açougue, Pet Shop, Roupas) ===== -->
+  <!-- ===== PAINEL DE PRODUTOS (Mercado, Açougue, Pet Shop, Roupas, Indústria, Lanchonete, Bar, Restaurante) ===== -->
   <div th:unless="${c.agendavel}" class="mt-4">
     <h2>Novo produto</h2>
     <form method="post" enctype="multipart/form-data" th:action="@{/painel/{id}/produtos(id=${c.id})}" class="row g-3 mb-4">
