@@ -43,4 +43,11 @@ public class Comercio {
         return categoria != null
             && categoria.getTipoPainel() == CategoriaComercio.TipoPainel.AGENDAMENTO;
     }
+
+    /** Prestadores de serviços terceirizados (eletricista, encanador...): lista de serviços, sem estoque nem agenda. */
+    @JsonIgnore
+    public boolean isServico() {
+        return categoria != null
+            && categoria.getTipoPainel() == CategoriaComercio.TipoPainel.SERVICOS;
+    }
 }

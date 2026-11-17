@@ -12,9 +12,11 @@
   <img th:if="${not #strings.isEmpty(c.fotoCapa)}" th:src="@{${c.fotoCapa}}" th:alt="${'Foto de ' + c.nome}"
        class="capa-grande rounded mb-3" onerror="this.style.display='none'">
   <!-- Botão direto para o WhatsApp do lojista -->
-  <a class="btn btn-verde btn-lg mb-4" target="_blank" th:href="'https://wa.me/' + ${c.whatsapp}">Falar no WhatsApp</a>
+  <a class="btn btn-verde btn-lg mb-4" target="_blank" th:href="'https://wa.me/' + ${c.whatsapp}"
+     th:text="${c.servico} ? 'Pedir orçamento pelo WhatsApp' : 'Falar no WhatsApp'">Falar no WhatsApp</a>
 
-  <!-- Comércio de produtos: lista -->
+  <h2 th:if="${c.servico}">Serviços oferecidos</h2>
+  <!-- Comércio de produtos (ou prestador de serviços): lista -->
   <div th:unless="${c.agendavel}" class="row g-4">
     <div class="col-12 col-md-6 col-lg-4" th:each="p : ${produtos}">
       <div class="card h-100">
@@ -23,11 +25,16 @@
              class="card-img-top foto-produto" onerror="this.style.display='none'">
         <div class="card-body">
         <h3 th:text="${p.nome}">Produto</h3>
-        <p class="preco" th:text="${#numbers.formatCurrency(p.preco)}">R$ 0,00</p>
-        <p th:text="${p.estoque > 0} ? 'Disponível: ' + ${p.estoque} : 'Esgotado'"></p>
+        <p class="text-muted" th:if="${not #strings.isEmpty(p.descricao)}" th:text="${p.descricao}"></p>
+        <p class="preco" th:text="${c.servico} ? 'A partir de ' + ${#numbers.formatCurrency(p.preco)} : ${#numbers.formatCurrency(p.preco)}">R$ 0,00</p>
+        <p th:unless="${c.servico}" th:text="${p.estoque > 0} ? 'Disponível: ' + ${p.estoque} : 'Esgotado'"></p>
+        <!-- Serviço: botão que abre o WhatsApp do prestador já com a mensagem do orçamento -->
+        <a th:if="${c.servico}" class="btn btn-verde btn-lg w-100" target="_blank" rel="noopener"
+           th:with="msg=${'Olá! Vi o serviço ' + p.nome + ' no Conecta Bairro e gostaria de pedir um orçamento.'}"
+           th:href="@{https://wa.me/{numero}(numero=${c.whatsapp},text=${msg})}">Pedir orçamento</a>
       </div></div>
     </div>
-    <p th:if="${#lists.isEmpty(produtos)}" class="fs-4">Ainda não há produtos cadastrados.</p>
+    <p th:if="${#lists.isEmpty(produtos)}" class="fs-4" th:text="${c.servico} ? 'Ainda não há serviços cadastrados.' : 'Ainda não há produtos cadastrados.'">Ainda não há produtos cadastrados.</p>
   </div>
 
   <!-- Barbearia: escolha de data e horário -->

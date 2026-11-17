@@ -75,6 +75,7 @@ public class PainelController {
         form.setNome(p.getNome());
         form.setPreco(p.getPreco());
         form.setEstoque(p.getEstoque());
+        form.setDescricao(p.getDescricao());
         m.addAttribute("produtoForm", form);
         prepararEdicao(m, id, p);
         return "editar-produto";

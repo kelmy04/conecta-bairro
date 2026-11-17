@@ -25,7 +25,7 @@
         <div class="card-footer d-grid gap-2">
           <!-- Barbearia gerencia a agenda; os demais gerenciam produtos (mesma rota: /painel/{id}) -->
           <a class="btn btn-verde btn-lg" th:href="@{/painel/{id}(id=${c.id})}"
-             th:text="${c.agendavel} ? 'Gerenciar Agenda' : 'Gerenciar Produtos'">Gerenciar Produtos</a>
+             th:text="${c.agendavel} ? 'Gerenciar Agenda' : (${c.servico} ? 'Gerenciar Serviços' : 'Gerenciar Produtos')">Gerenciar Produtos</a>
           <a class="btn btn-azul btn-lg" th:href="@{/comercio/{id}/editar(id=${c.id})}">Editar Estabelecimento</a>
           <!-- Exclusão: pede confirmação e envia um POST (o servidor confere se você é o dono) -->
           <form method="post" th:action="@{/comercio/{id}/excluir(id=${c.id})}" class="d-grid"

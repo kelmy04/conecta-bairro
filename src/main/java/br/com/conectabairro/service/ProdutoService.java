@@ -35,7 +35,8 @@ public class ProdutoService {
         p.setComercio(comercio);
         p.setNome(f.getNome().trim());
         p.setPreco(f.getPreco());
-        p.setEstoque(f.getEstoque());
+        p.setEstoque(comercio.isServico() ? 0 : f.getEstoque());   // serviço não tem estoque
+        p.setDescricao(limpar(f.getDescricao()));
         p.setFotoUrl(foto);
         try {
             return repo.save(p);
@@ -69,7 +70,8 @@ public class ProdutoService {
 
         p.setNome(f.getNome().trim());
         p.setPreco(f.getPreco());
-        p.setEstoque(f.getEstoque());
+        p.setEstoque(p.getComercio().isServico() ? 0 : f.getEstoque());   // serviço não tem estoque
+        p.setDescricao(limpar(f.getDescricao()));
         if (fotoNova != null) p.setFotoUrl(fotoNova);                  // senão, mantém a antiga
 
         Produto salvo;
@@ -112,14 +114,32 @@ public class ProdutoService {
         armazenamento.remover(p.getFotoUrl());   // apaga também o arquivo da imagem
     }
 
-    /** Monta o texto pronto para colar no WhatsApp/Instagram. */
+    /** Texto vazio vira null (campo opcional não preenchido). */
+    private String limpar(String texto) {
+        return (texto == null || texto.isBlank()) ? null : texto.trim();
+    }
+
+    /** Monta o texto pronto para colar no WhatsApp/Instagram (há um modelo para produtos e outro para serviços). */
     public String gerarPost(Long produtoId) {
         Produto p = buscar(produtoId);
         Comercio c = p.getComercio();
         String preco = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(p.getPreco());
-        String urgencia = p.getEstoque() <= 5 ? "⚠️ Últimas " + p.getEstoque() + " unidades!\n" : "";
+        String descricao = (p.getDescricao() == null || p.getDescricao().isBlank()) ? "" : p.getDescricao() + "\n";
+
+        if (c.isServico()) {   // prestador de serviço: preço "a partir de" e convite para pedir orçamento
+            return "🛠️ *" + c.getNome().toUpperCase() + "*\n\n"
+                 + "✅ " + p.getNome() + " a partir de *" + preco + "*\n"
+                 + descricao
+                 + "\n📍 " + c.getEndereco()
+                 + "\n💬 Peça seu orçamento pelo WhatsApp: https://wa.me/" + c.getWhatsapp()
+                 + "\n\n#ConectaBairro #ServiçosDoBairro";
+        }
+        // "Últimas unidades" só aparece quando ainda há de 1 a 5 em estoque
+        String urgencia = (p.getEstoque() >= 1 && p.getEstoque() <= 5)
+                ? "⚠️ Últimas " + p.getEstoque() + " unidades!\n" : "";
         return "🔥 *OFERTA NO " + c.getNome().toUpperCase() + "!* 🔥\n\n"
              + "👉 " + p.getNome() + " por apenas *" + preco + "*\n"
+             + descricao
              + urgencia
              + "\n📍 " + c.getEndereco()
              + "\n💬 Peça pelo WhatsApp: https://wa.me/" + c.getWhatsapp()

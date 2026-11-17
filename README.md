@@ -8,7 +8,7 @@
 ![Docker](https://img.shields.io/badge/Docker-pronto-2496ED)
 ![Status](https://img.shields.io/badge/status-em%20produ%C3%A7%C3%A3o-brightgreen)
 
-Plataforma web que **digitaliza e conecta os pequenos comércios de um bairro**: mercado, açougue, pet shop, loja de roupas, indústria, lanchonete, bar, restaurante, barbearia e cabeleireiro(a).
+Plataforma web que **digitaliza e conecta os pequenos comércios de um bairro**: mercado, açougue, pet shop, loja de roupas, indústria, lanchonete, bar, restaurante, barbearia, cabeleireiro(a) e prestadores de serviços terceirizados (eletricista, encanador, diarista...).
 Os moradores encontram os comércios, veem produtos e marcam horários pelo celular; os donos gerenciam tudo em um painel simples, com fontes grandes e cores amigáveis, pensado para quem tem pouca familiaridade com tecnologia.
 
 Projeto de extensão universitária de Engenharia de Computação.
@@ -42,6 +42,7 @@ Em produção para demonstração. A hospedagem gratuita "dorme" depois de algun
 * Página de cada comércio com foto de capa, endereço e botão direto para o **WhatsApp** do lojista.
 * Lojas de produtos: catálogo com foto, preço e estoque.
 * Barbearia e cabeleireiro(a): reserva de horário sem precisar criar conta.
+* Prestadores de serviços (eletricista, encanador, diarista, pedreiro, pintor...): lista de serviços com preço "a partir de" e botão **Pedir orçamento**, que abre o WhatsApp do prestador com a mensagem pronta.
 
 **Painel do lojista**
 

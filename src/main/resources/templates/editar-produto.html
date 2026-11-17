@@ -5,29 +5,37 @@
 <header th:replace="~{fragmentos :: topo}"></header>
 <main class="container py-4" style="max-width:640px">
   <a th:href="@{/painel/{id}(id=${c.id})}" class="fs-5">← Voltar ao painel</a>
-  <h1 class="mt-2">Editar produto</h1>
+  <h1 class="mt-2" th:text="${c.servico} ? 'Editar serviço' : 'Editar produto'">Editar produto</h1>
 
   <!-- ITEM 3: formulário já preenchido. enctype multipart permite trocar a foto (arquivo) -->
-  <form method="post" enctype="multipart/form-data" th:object="${produtoForm}"
+  <form method="post" enctype="multipart/form-data" th:object="${produtoForm}" th:with="ehServico=${c.servico}"
         th:action="@{/painel/{id}/produtos/{pid}/editar(id=${c.id},pid=${produto.id})}">
     <div class="mb-3">
-      <label class="form-label fs-5" for="nome">Nome do produto</label>
+      <label class="form-label fs-5" for="nome" th:text="${ehServico} ? 'Nome do serviço' : 'Nome do produto'">Nome do produto</label>
       <input th:field="*{nome}" class="form-control form-control-lg" required>
       <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
     </div>
     <div class="row g-3 mb-3">
-      <div class="col-6">
-        <label class="form-label fs-5" for="preco">Preço (R$)</label>
+      <div th:class="${ehServico} ? 'col-12' : 'col-6'">
+        <label class="form-label fs-5" for="preco" th:text="${ehServico} ? 'Preço a partir de (R$)' : 'Preço (R$)'">Preço (R$)</label>
         <!-- formatDecimal garante o ponto decimal (24.90), exigido pelo campo number -->
         <input id="preco" name="preco" type="number" step="0.01" min="0.01" class="form-control form-control-lg" required
                th:value="${#numbers.formatDecimal(produtoForm.preco,1,'NONE',2,'POINT')}">
         <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('preco')}" th:errors="*{preco}"></p>
       </div>
-      <div class="col-6">
+      <!-- Serviço não tem estoque -->
+      <input th:if="${ehServico}" type="hidden" name="estoque" value="0">
+      <div class="col-6" th:unless="${ehServico}">
         <label class="form-label fs-5" for="estoque">Estoque</label>
         <input th:field="*{estoque}" type="number" min="0" class="form-control form-control-lg" required>
         <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('estoque')}" th:errors="*{estoque}"></p>
       </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label fs-5" for="descricao">Descrição (opcional)</label>
+      <textarea th:field="*{descricao}" rows="2" maxlength="300" class="form-control form-control-lg"></textarea>
+      <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}"></p>
     </div>
 
     <div class="mb-4">

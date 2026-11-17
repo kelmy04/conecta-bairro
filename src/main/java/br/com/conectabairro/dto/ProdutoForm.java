@@ -27,6 +27,9 @@ public class ProdutoForm {
     @Max(value = 100000, message = "Estoque acima do limite permitido.")
     private Integer estoque;
 
+    @Size(max = 300, message = "A descrição deve ter no máximo 300 caracteres.")
+    private String descricao;
+
     // ETAPA 1: foto do produto como arquivo (JPG/PNG até 3 MB, opcional)
     private MultipartFile fotoProduto;
 }

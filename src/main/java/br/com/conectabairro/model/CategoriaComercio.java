@@ -7,7 +7,8 @@ import lombok.Setter;
 /** Categoria do comércio. O tipoPainel decide qual painel o lojista enxerga. */
 @Entity @Getter @Setter
 public class CategoriaComercio {
-    public enum TipoPainel { PRODUTOS, AGENDAMENTO }
+    // PRODUTOS = catálogo/cardápio | AGENDAMENTO = agenda de horários | SERVICOS = prestadores de serviço (lista de serviços e preços, orçamento pelo WhatsApp)
+    public enum TipoPainel { PRODUTOS, AGENDAMENTO, SERVICOS }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

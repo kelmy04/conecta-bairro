@@ -8,7 +8,7 @@
 CREATE TABLE categoria_comercio (
     id          BIGSERIAL PRIMARY KEY,
     nome        VARCHAR(50) NOT NULL UNIQUE,
-    tipo_painel VARCHAR(20) NOT NULL CHECK (tipo_painel IN ('PRODUTOS','AGENDAMENTO')),
+    tipo_painel VARCHAR(20) NOT NULL CHECK (tipo_painel IN ('PRODUTOS','AGENDAMENTO','SERVICOS')),
     servicos    VARCHAR(300)             -- serviços da agenda, separados por ';' (só categorias de AGENDAMENTO)
 );
 
@@ -37,7 +37,8 @@ CREATE TABLE produto (            -- exclui junto com o comércio
     nome        VARCHAR(100) NOT NULL,
     preco       NUMERIC(10,2) NOT NULL CHECK (preco > 0),
     estoque     INTEGER NOT NULL DEFAULT 0 CHECK (estoque >= 0),
-    foto_url    VARCHAR(300)
+    foto_url    VARCHAR(300),
+    descricao   VARCHAR(300)             -- texto curto opcional (ingredientes, o que o serviço inclui...)
 );
 
 CREATE TABLE agendamento (
@@ -60,4 +61,9 @@ INSERT INTO categoria_comercio (nome, tipo_painel, servicos) VALUES
  ('Indústria','PRODUTOS',NULL),('Lanchonete','PRODUTOS',NULL),
  ('Bar','PRODUTOS',NULL),('Restaurante','PRODUTOS',NULL),
  ('Barbearia','AGENDAMENTO','Corte;Barba;Corte + Barba'),
+ ('Cabeleireiro(a)','AGENDAMENTO','Corte;Escova;Coloração;Hidratação;Penteado'),
+ ('Eletricista','SERVICOS',NULL),('Encanador','SERVICOS',NULL),('Diarista e Limpeza','SERVICOS',NULL),
+ ('Pedreiro e Reformas','SERVICOS',NULL),('Pintor','SERVICOS',NULL),('Jardinagem','SERVICOS',NULL),
+ ('Técnico de Informática e Celular','SERVICOS',NULL),('Frete e Mudanças','SERVICOS',NULL),
+ ('Outros Serviços','SERVICOS',NULL);Barba;Corte + Barba'),
  ('Cabeleireiro(a)','AGENDAMENTO','Corte;Escova;Coloração;Hidratação;Penteado');

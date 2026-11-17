@@ -19,4 +19,8 @@ public class Produto {
     @NotNull @DecimalMin("0.01") private BigDecimal preco;
     @NotNull @Min(0) private Integer estoque;
     private String fotoUrl;
+
+    // Texto curto opcional: ingredientes de um prato, o que o serviço inclui, etc.
+    @Column(length = 300)
+    private String descricao;
 }

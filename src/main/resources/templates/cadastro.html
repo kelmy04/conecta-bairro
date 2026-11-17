@@ -11,7 +11,7 @@
   <form method="post" enctype="multipart/form-data" th:object="${comercioForm}"
         th:action="${editando} ? @{${acao}} : @{/cadastrar}">
     <div class="mb-3">
-      <label class="form-label fs-5" for="nome">Nome do comércio</label>
+      <label class="form-label fs-5" for="nome">Nome do comércio ou do prestador</label>
       <input th:field="*{nome}" class="form-control form-control-lg" required>
       <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
     </div>
@@ -33,7 +33,7 @@
     </div>
 
     <div class="mb-3">
-      <label class="form-label fs-5" for="endereco">Endereço</label>
+      <label class="form-label fs-5" for="endereco">Endereço (ou região que você atende)</label>
       <input th:field="*{endereco}" class="form-control form-control-lg" required>
       <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('endereco')}" th:errors="*{endereco}"></p>
     </div>
