@@ -34,7 +34,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(a -> a
                 // Editar e excluir comércio exigem login e PRECISA vir antes da regra pública de /comercio/**
                 .requestMatchers("/comercio/*/editar", "/comercio/*/excluir").authenticated()
-                .requestMatchers("/", "/comercio/**", "/css/**", "/uploads/**", "/login", "/registrar", "/error").permitAll()
+                .requestMatchers("/", "/comercio/**", "/css/**", "/img/**", "/uploads/**", "/login", "/registrar", "/error").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/**").permitAll()   // somente consultas
                 .requestMatchers("/painel/**").authenticated()
                 .anyRequest().authenticated())                            // /cadastrar, escritas da API...

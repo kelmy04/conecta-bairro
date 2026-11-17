@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="Conecta Bairro"><title>Conecta Bairro</title>
+<path d="M64 119C64 119 17 83 17 54a47 47 0 1 1 94 0C111 83 64 119 64 119Z" fill="#1F6FB2"/>
+<circle cx="64" cy="54" r="34" fill="#FFF8EE"/>
+<rect x="43" y="47" width="42" height="29" rx="2.5" fill="#14507F"/>
+<rect x="47" y="56" width="9" height="9" rx="1.5" fill="#FFF8EE"/>
+<rect x="72" y="56" width="9" height="9" rx="1.5" fill="#FFF8EE"/>
+<path d="M58 76V62.5a6 6 0 0 1 12 0V76Z" fill="#2E9E5B"/>
+<path d="M45 35H83L89 47H39Z" fill="#E8731A"/>
+<path d="M39.00 47a6.25 6.25 0 0 0 12.50 0Z" fill="#E8731A"/>
+<path d="M51.50 47a6.25 6.25 0 0 0 12.50 0Z" fill="#F6A25E"/>
+<path d="M64.00 47a6.25 6.25 0 0 0 12.50 0Z" fill="#E8731A"/>
+<path d="M76.50 47a6.25 6.25 0 0 0 12.50 0Z" fill="#F6A25E"/>
+<path d="M54.50 35H64.00L64.00 47H51.50Z" fill="#F6A25E"/>
+<path d="M73.50 35H83.00L89.00 47H76.50Z" fill="#F6A25E"/>
+</svg>

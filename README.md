@@ -1,5 +1,7 @@
 # Conecta Bairro
 
+<p align="center"><img src="src/main/resources/static/img/logo.svg" alt="Conecta Bairro" width="360"></p>
+
 ![Java](https://img.shields.io/badge/Java-17+-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-banco%20de%20dados-336791)

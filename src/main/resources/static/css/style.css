@@ -8,7 +8,8 @@ html { font-size: 20px; }                       /* fonte grande = acessibilidade
 body { background: var(--fundo); color: var(--texto); font-family: "Segoe UI", Arial, sans-serif; }
 h1 { color: var(--azul-escuro); font-weight: 700; }
 .topo { background: var(--azul); padding: .9rem 0; }
-.logo { color: #fff; font-size: 1.5rem; font-weight: 700; text-decoration: none; }
+.logo { color: #fff; font-size: 1.5rem; font-weight: 700; text-decoration: none; display: inline-block; }
+.logo-img { height: 50px; width: auto; max-width: 100%; display: block; }   /* proporção da logo mantida */
 .categoria { border-left: 8px solid var(--laranja); padding-left: .6rem; color: var(--azul-escuro); }
 .card-comercio { text-decoration: none; color: inherit; border: 2px solid transparent; }
 .card-comercio:hover, .card-comercio:focus { border-color: var(--azul); }
