@@ -3,6 +3,7 @@ package br.com.conectabairro.controller;
 import br.com.conectabairro.dto.ComercioForm;
 import br.com.conectabairro.exception.ArquivoInvalidoException;
 import br.com.conectabairro.exception.ExpedienteInvalidoException;
+import br.com.conectabairro.exception.RegraNegocioException;
 import br.com.conectabairro.model.Comercio;
 import br.com.conectabairro.service.AgendamentoService;
 import br.com.conectabairro.service.ComercioService;
@@ -51,6 +52,8 @@ public class ComercioController {
                 br.rejectValue("fotoCapa", "foto.invalida", e.getMessage());   // erro junto ao campo da foto
             } catch (ExpedienteInvalidoException e) {
                 br.rejectValue("fechamento", "expediente.invalido", e.getMessage());   // erro nos horários
+            } catch (RegraNegocioException e) {
+                br.rejectValue("categoriaId", "categoria.invalida", e.getMessage());   // ex.: troca bloqueada por agendamentos
             }
         }
         preparar(m, c);   // volta ao formulário com as mensagens de erro
@@ -71,9 +74,9 @@ public class ComercioController {
     /** Dados extras que o template cadastro.html usa no modo edição. */
     private void preparar(Model m, Comercio c) {
         m.addAttribute("editando", true);
-        m.addAttribute("agendavel", c.isAgendavel());   // só barbearia mostra abertura/fechamento
         m.addAttribute("acao", "/comercio/" + c.getId() + "/editar");
-        m.addAttribute("categoriaNome", c.getCategoria().getNome());
+        m.addAttribute("categorias", comercios.listarCategorias());          // opções do campo "Tipo"
+        m.addAttribute("categoriaOriginalId", c.getCategoria().getId());     // para avisar quando o tipo for trocado
         m.addAttribute("fotoAtual", c.getFotoCapa());
     }
 }

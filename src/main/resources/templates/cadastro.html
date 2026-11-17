@@ -16,20 +16,21 @@
       <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></p>
     </div>
 
-    <!-- Novo comércio: escolhe o tipo -->
-    <div class="mb-3" th:unless="${editando}">
+    <!-- Tipo do comércio: escolhido no cadastro e TAMBÉM editável depois.
+         data-original guarda o tipo atual (só na edição) para avisar quando o lojista o trocar. -->
+    <div class="mb-3">
       <label class="form-label fs-5" for="categoriaId">Tipo</label>
-      <select th:field="*{categoriaId}" class="form-select form-select-lg" required onchange="atualizarExpediente()">
+      <select th:field="*{categoriaId}" class="form-select form-select-lg" required onchange="aoTrocarTipo()"
+              th:attr="data-original=${categoriaOriginalId}">
         <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nome}"
                 th:attr="data-agenda=${cat.tipoPainel.name() == 'AGENDAMENTO'}"></option>
       </select>
       <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('categoriaId')}" th:errors="*{categoriaId}"></p>
-    </div>
-    <!-- Edição: o tipo não muda (trocaria o painel entre produtos e agenda) -->
-    <div class="mb-3" th:if="${editando}">
-      <label class="form-label fs-5">Tipo</label>
-      <p class="fs-5 fw-bold mb-0" th:text="${categoriaNome}">Mercado</p>
-      <input type="hidden" th:field="*{categoriaId}">
+      <!-- Aviso (só na edição, e só quando o tipo escolhido é diferente do atual) -->
+      <div id="avisoTipo" class="alert alert-warning fs-6 mt-2 mb-0 d-none" role="alert" th:if="${editando}">
+        Você está trocando o tipo do estabelecimento, então o painel passa a ser o do novo tipo (produtos, serviços ou agenda).
+        Nada é apagado: os itens e agendamentos antigos ficam guardados, mas não aparecem no novo painel.
+      </div>
     </div>
 
     <div class="mb-3">
@@ -43,10 +44,9 @@
       <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('whatsapp')}" th:errors="*{whatsapp}"></p>
     </div>
 
-    <!-- Expediente da agenda: só aparece para BARBEARIA. O fechamento é quando o atendimento encerra:
+    <!-- Expediente da agenda: só aparece para tipos com AGENDA (barbearia, cabeleireiro). O fechamento é quando o atendimento encerra:
          abre 07:00 e fecha 22:00 -> reservas das 07:00 até 21:50, de 10 em 10 minutos -->
-    <div id="blocoExpediente" class="mb-3 border rounded p-3 bg-white"
-         th:if="${!editando or agendavel}" th:classappend="${!editando} ? 'd-none'">
+    <div id="blocoExpediente" class="mb-3 border rounded p-3 bg-white d-none">
       <p class="fs-5 fw-bold mb-1">Horário de atendimento da agenda</p>
       <p class="text-muted mb-3">Os clientes reservam de 10 em 10 minutos, entre a abertura e o fechamento.</p>
       <div class="row g-3">
@@ -85,20 +85,25 @@
   </form>
 </main>
 <script>
-  // Mostra os campos de abertura/fechamento só quando o tipo escolhido é uma barbearia (agenda)
+  // Mostra os campos de abertura/fechamento só quando o tipo escolhido tem agenda
   function atualizarExpediente() {
     const bloco = document.getElementById('blocoExpediente');
-    if (!bloco) return;
     const sel = document.getElementById('categoriaId');
-    let agenda = true;                                   // na edição não há <select>: o bloco só existe para barbearia
-    if (sel) {
-      const opcao = sel.options[sel.selectedIndex];
-      agenda = !!opcao && opcao.dataset.agenda === 'true';
-      bloco.classList.toggle('d-none', !agenda);
-    }
-    bloco.querySelectorAll('input').forEach(i => i.required = agenda);
+    if (!bloco || !sel) return;
+    const opcao = sel.options[sel.selectedIndex];
+    const agenda = !!opcao && opcao.dataset.agenda === 'true';
+    bloco.classList.toggle('d-none', !agenda);
+    bloco.querySelectorAll('input').forEach(i => i.required = agenda);   // só obrigatórios quando visíveis
   }
-  document.addEventListener('DOMContentLoaded', atualizarExpediente);
+
+  // Ao trocar o tipo: atualiza o expediente e, na edição, avisa que o painel vai mudar
+  function aoTrocarTipo() {
+    atualizarExpediente();
+    const sel = document.getElementById('categoriaId');
+    const aviso = document.getElementById('avisoTipo');
+    if (sel && aviso) aviso.classList.toggle('d-none', sel.value === sel.dataset.original);
+  }
+  document.addEventListener('DOMContentLoaded', aoTrocarTipo);
 
   // Avisa antes de enviar se a imagem passa de 3 MB (o servidor também confere)
   function validarTamanho(input) {

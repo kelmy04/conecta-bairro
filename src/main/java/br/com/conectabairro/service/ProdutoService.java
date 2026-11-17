@@ -123,12 +123,14 @@ public class ProdutoService {
     public String gerarPost(Long produtoId) {
         Produto p = buscar(produtoId);
         Comercio c = p.getComercio();
-        String preco = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(p.getPreco());
+        // preço vazio (serviço "a combinar") não pode quebrar o texto do post
+        String preco = p.getPreco() == null ? null
+                : NumberFormat.getCurrencyInstance(Locale.forLanguageTag("pt-BR")).format(p.getPreco());
         String descricao = (p.getDescricao() == null || p.getDescricao().isBlank()) ? "" : p.getDescricao() + "\n";
 
         if (c.isServico()) {   // prestador de serviço: preço "a partir de" e convite para pedir orçamento
             return "🛠️ *" + c.getNome().toUpperCase() + "*\n\n"
-                 + "✅ " + p.getNome() + " a partir de *" + preco + "*\n"
+                 + "✅ " + p.getNome() + (preco == null ? " (preço a combinar)" : " a partir de *" + preco + "*") + "\n"
                  + descricao
                  + "\n📍 " + c.getEndereco()
                  + "\n💬 Peça seu orçamento pelo WhatsApp: https://wa.me/" + c.getWhatsapp()
@@ -138,7 +140,7 @@ public class ProdutoService {
         String urgencia = (p.getEstoque() >= 1 && p.getEstoque() <= 5)
                 ? "⚠️ Últimas " + p.getEstoque() + " unidades!\n" : "";
         return "🔥 *OFERTA NO " + c.getNome().toUpperCase() + "!* 🔥\n\n"
-             + "👉 " + p.getNome() + " por apenas *" + preco + "*\n"
+             + "👉 " + p.getNome() + (preco == null ? " (consulte o preço)" : " por apenas *" + preco + "*") + "\n"
              + descricao
              + urgencia
              + "\n📍 " + c.getEndereco()

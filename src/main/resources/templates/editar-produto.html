@@ -17,9 +17,9 @@
     </div>
     <div class="row g-3 mb-3">
       <div th:class="${ehServico} ? 'col-12' : 'col-6'">
-        <label class="form-label fs-5" for="preco" th:text="${ehServico} ? 'Preço a partir de (R$)' : 'Preço (R$)'">Preço (R$)</label>
+        <label class="form-label fs-5" for="preco" th:text="${ehServico} ? 'Preço a partir de (R$) - opcional' : 'Preço (R$) - opcional'">Preço (R$)</label>
         <!-- formatDecimal garante o ponto decimal (24.90), exigido pelo campo number -->
-        <input id="preco" name="preco" type="number" step="0.01" min="0.01" class="form-control form-control-lg" required
+        <input id="preco" name="preco" type="number" step="0.01" min="0.01" class="form-control form-control-lg"
                th:value="${#numbers.formatDecimal(produtoForm.preco,1,'NONE',2,'POINT')}">
         <p class="text-danger fs-6 mb-0" th:if="${#fields.hasErrors('preco')}" th:errors="*{preco}"></p>
       </div>

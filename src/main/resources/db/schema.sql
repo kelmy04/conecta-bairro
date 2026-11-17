@@ -35,7 +35,7 @@ CREATE TABLE produto (            -- exclui junto com o comércio
     id          BIGSERIAL PRIMARY KEY,
     comercio_id BIGINT NOT NULL REFERENCES comercio(id) ON DELETE CASCADE,
     nome        VARCHAR(100) NOT NULL,
-    preco       NUMERIC(10,2) NOT NULL CHECK (preco > 0),
+    preco       NUMERIC(10,2) CHECK (preco > 0),   -- opcional: item "a combinar"
     estoque     INTEGER NOT NULL DEFAULT 0 CHECK (estoque >= 0),
     foto_url    VARCHAR(300),
     descricao   VARCHAR(300)             -- texto curto opcional (ingredientes, o que o serviço inclui...)

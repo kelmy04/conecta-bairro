@@ -29,4 +29,20 @@ public class BancoConfig {
             }
         };
     }
+
+    /**
+     * O preço deixou de ser obrigatório (item "a combinar"). Em um banco já criado, a coluna produto.preco
+     * continua NOT NULL, e o Hibernate (ddl-auto=update) não remove essa restrição sozinho. Este comando
+     * a remove. É idempotente: se a coluna já aceita nulo, nada acontece.
+     */
+    @Bean
+    CommandLineRunner liberarPrecoOpcional(JdbcTemplate jdbc) {
+        return args -> {
+            try {
+                jdbc.execute("ALTER TABLE produto ALTER COLUMN preco DROP NOT NULL");
+            } catch (Exception e) {
+                log.warn("Não foi possível tornar produto.preco opcional: {}", e.getMessage());
+            }
+        };
+    }
 }

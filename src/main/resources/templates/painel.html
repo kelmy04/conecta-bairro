@@ -13,7 +13,7 @@
     <h2 th:text="${ehServico} ? 'Novo serviço' : 'Novo produto'">Novo produto</h2>
     <form method="post" enctype="multipart/form-data" th:action="@{/painel/{id}/produtos(id=${c.id})}" class="row g-3 mb-4">
       <div class="col-12"><input name="nome" class="form-control form-control-lg" placeholder="Nome do produto" th:placeholder="${ehServico} ? 'Nome do serviço (ex.: Troca de chuveiro)' : 'Nome do produto'" required></div>
-      <div th:class="${ehServico} ? 'col-12' : 'col-6'"><input name="preco" type="number" step="0.01" min="0.01" class="form-control form-control-lg" placeholder="Preço (R$)" th:placeholder="${ehServico} ? 'Preço a partir de (R$)' : 'Preço (R$)'" required></div>
+      <div th:class="${ehServico} ? 'col-12' : 'col-6'"><input name="preco" type="number" step="0.01" min="0.01" class="form-control form-control-lg" placeholder="Preço (R$)" th:placeholder="${ehServico} ? 'Preço a partir de (R$) - opcional' : 'Preço (R$) - opcional'"></div>
       <div class="col-6" th:unless="${ehServico}"><input name="estoque" type="number" min="0" class="form-control form-control-lg" placeholder="Estoque" required></div>
       <!-- Serviço não tem estoque: o campo some e o sistema grava 0 -->
       <input th:if="${ehServico}" type="hidden" name="estoque" value="0">
@@ -48,7 +48,7 @@
               <span th:text="${p.nome}"></span>
               <small class="d-block text-muted" th:if="${not #strings.isEmpty(p.descricao)}" th:text="${p.descricao}"></small>
             </td>
-            <td th:text="${#numbers.formatCurrency(p.preco)}"></td>
+            <td th:text="${p.preco != null} ? ${#numbers.formatCurrency(p.preco)} : 'A combinar'"></td>
             <td th:unless="${ehServico}" th:text="${p.estoque}"></td>
             <td class="text-nowrap">
               <!-- ITEM 3: botão Editar (lápis) abre o formulário já preenchido -->

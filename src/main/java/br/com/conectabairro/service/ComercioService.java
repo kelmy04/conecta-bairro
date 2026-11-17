@@ -3,8 +3,10 @@ package br.com.conectabairro.service;
 import br.com.conectabairro.dto.ComercioForm;
 import br.com.conectabairro.exception.ExpedienteInvalidoException;
 import br.com.conectabairro.exception.RegraNegocioException;
+import br.com.conectabairro.model.Agendamento;
 import br.com.conectabairro.model.CategoriaComercio;
 import br.com.conectabairro.model.Comercio;
+import br.com.conectabairro.repository.AgendamentoRepository;
 import br.com.conectabairro.repository.CategoriaRepository;
 import br.com.conectabairro.repository.ComercioRepository;
 import br.com.conectabairro.repository.UsuarioRepository;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import java.text.Collator;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -23,6 +26,7 @@ import java.util.*;
 public class ComercioService {
     private final ComercioRepository repo;
     private final CategoriaRepository categorias;
+    private final AgendamentoRepository agendamentos;
     private final UsuarioRepository usuarios;
     private final ArmazenamentoService armazenamento;
 
@@ -80,21 +84,31 @@ public class ComercioService {
 
     /**
      * ETAPA 3: edição do estabelecimento pelo próprio dono.
-     * O tipo (categoria) não muda aqui, pois isso trocaria o painel (produtos x agenda).
+     * O tipo (categoria) PODE ser trocado. Nada é apagado na troca: produtos, serviços e agendamentos antigos
+     * continuam no banco, só não aparecem no painel do novo tipo. Duas regras protegem os clientes e os dados:
+     *  - sair de uma agenda com horários futuros confirmados é recusado (ver validarTrocaDeCategoria);
+     *  - se o novo tipo for uma agenda, abertura e fechamento passam a ser obrigatórios.
      * Foto: se veio um arquivo novo, salva e apaga a antiga; se não veio, mantém a atual.
      */
     public Comercio editar(Long id, ComercioForm f, String emailLogado) {
         Comercio c = buscarDoDono(id, emailLogado);            // só o dono pode editar
+        CategoriaComercio nova = categorias.findById(f.getCategoriaId())
+                .orElseThrow(() -> new RegraNegocioException("Tipo de comércio inválido."));
+        validarTrocaDeCategoria(c, nova);                      // tudo conferido ANTES de salvar a foto nova
+        validarExpediente(nova, f.getAbertura(), f.getFechamento());   // só vale se o novo tipo for agenda
         String fotoAntiga = c.getFotoCapa();
-        if (c.isAgendavel()) validarExpediente(c.getCategoria(), f.getAbertura(), f.getFechamento());
         String fotoNova = armazenamento.salvar(f.getFotoCapa());   // null = nenhuma foto enviada
 
         c.setNome(f.getNome().trim());
+        c.setCategoria(nova);
         c.setEndereco(f.getEndereco().trim());
         c.setWhatsapp(f.getWhatsapp());
-        if (c.isAgendavel()) {                                  // o lojista pode mudar o expediente da agenda
+        if (nova.getTipoPainel() == CategoriaComercio.TipoPainel.AGENDAMENTO) {   // expediente só existe para agenda
             c.setAbertura(f.getAbertura());
             c.setFechamento(f.getFechamento());
+        } else {
+            c.setAbertura(null);
+            c.setFechamento(null);
         }
         if (fotoNova != null) c.setFotoCapa(fotoNova);         // senão, mantém a foto antiga
 
@@ -168,8 +182,10 @@ public class ComercioService {
     public Comercio atualizar(Long id, Comercio novo) {
         Comercio c = buscar(id);
         String fotoAntiga = c.getFotoCapa();
+        CategoriaComercio novaCategoria = resolverCategoria(novo.getCategoria());
+        validarTrocaDeCategoria(c, novaCategoria);   // mesma proteção da tela: não esconder clientes agendados
         c.setNome(novo.getNome());
-        c.setCategoria(resolverCategoria(novo.getCategoria()));
+        c.setCategoria(novaCategoria);
         c.setAbertura(novo.getAbertura());
         c.setFechamento(novo.getFechamento());
         normalizarExpediente(c);
@@ -179,6 +195,21 @@ public class ComercioService {
         Comercio salvo = salvar(c);
         if (!Objects.equals(fotoAntiga, salvo.getFotoCapa())) armazenamento.remover(fotoAntiga);   // não deixa arquivo órfão
         return salvo;
+    }
+
+    /**
+     * Troca de tipo: se o comércio tem uma AGENDA e vai passar para um tipo sem agenda, os horários futuros
+     * já confirmados sumiriam do painel e o cliente ficaria sem atendimento. Por isso a troca só é permitida
+     * depois que o lojista cancelar esses agendamentos (na tela de agenda).
+     */
+    private void validarTrocaDeCategoria(Comercio c, CategoriaComercio nova) {
+        if (Objects.equals(c.getCategoria().getId(), nova.getId())) return;     // não mudou
+        boolean saindoDaAgenda = c.isAgendavel()
+                && nova.getTipoPainel() != CategoriaComercio.TipoPainel.AGENDAMENTO;
+        if (saindoDaAgenda && agendamentos.existsByComercioIdAndStatusAndDataHoraAfter(
+                c.getId(), Agendamento.Status.CONFIRMADO, LocalDateTime.now()))
+            throw new RegraNegocioException("Há clientes com horário marcado. Cancele os agendamentos futuros "
+                    + "na agenda antes de trocar o tipo.");
     }
 
     /**

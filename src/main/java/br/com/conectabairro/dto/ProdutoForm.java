@@ -17,7 +17,7 @@ public class ProdutoForm {
     @Size(max = 100, message = "O nome deve ter no máximo 100 caracteres.")
     private String nome;
 
-    @NotNull(message = "Informe o preço.")
+    // Opcional (produto ou serviço): sem preço, o item aparece como "a combinar". Se informado, deve ser > 0.
     @DecimalMin(value = "0.01", message = "O preço deve ser maior que zero.")
     @Digits(integer = 8, fraction = 2, message = "Preço inválido (use no máximo 2 casas decimais).")
     private BigDecimal preco;

@@ -16,7 +16,8 @@ public class Produto {
     @JsonIgnore @ManyToOne(optional = false) private Comercio comercio;
 
     @NotBlank private String nome;
-    @NotNull @DecimalMin("0.01") private BigDecimal preco;
+    // Preço OPCIONAL para produtos e serviços ("a combinar"). Se informado, precisa ser maior que zero.
+    @DecimalMin("0.01") private BigDecimal preco;
     @NotNull @Min(0) private Integer estoque;
     private String fotoUrl;
 

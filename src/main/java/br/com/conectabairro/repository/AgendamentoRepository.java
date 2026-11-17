@@ -13,6 +13,10 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     // Só devolve o agendamento se ele pertencer ao comércio informado (usado ao cancelar)
     Optional<Agendamento> findByIdAndComercioId(Long id, Long comercioId);
 
+    // Usado ao trocar o tipo do comércio: impede esconder clientes que já têm horário marcado
+    boolean existsByComercioIdAndStatusAndDataHoraAfter(
+            Long comercioId, Agendamento.Status status, LocalDateTime dataHora);
+
     boolean existsByComercioIdAndDataHoraAndStatus(
             Long comercioId, LocalDateTime dataHora, Agendamento.Status status);
 }
